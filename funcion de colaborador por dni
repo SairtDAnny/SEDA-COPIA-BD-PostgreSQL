@@ -1,0 +1,48 @@
+select * from oficina
+select * from salida_patrimonio
+
+insert into oficina values(1,'Oficna de Tecnologias de la Información', 107);
+insert into oficina values(2,'Planificacion', 108);
+insert into oficina values(3,'Almacen', 109);
+insert into oficina values(4,'Obras', 110);
+insert into oficina values(5,'Planiamiento', 101);
+insert into oficina values(6,'Seguridad', 102);
+
+
+--FUNCION DE LISTAR ENTREGAS DE EPPS A COLABORADORES
+
+drop FUNCTION listar_Registro_Dni;
+CREATE or replace FUNCTION listar_Registro_Dni(_colaborador varchar	)
+returns Table
+(
+	des_patrimonio varchar, 
+	cantidad integer,
+	um_patrimonio varchar,
+	fecha date,
+	tipo varchar
+)
+AS $func$
+BEGIN
+	return query		
+	select 
+	rsp.des_patrimonio, 
+	com.cantidad,
+	rsp.um_patrimonio,
+	com.fecha, 
+	com.tipo
+	from salida_patrimonio com
+	inner join colaborador rsc ON rsc.id = com.colaborador_id
+	INNER join patrimonio rsp ON rsp.id = com.patrimonio_id
+	where (select colaborador.id from colaborador 
+		   where _colaborador= colaborador.dni_colaborador) = com.patrimonio_id
+	order by com.fecha desc;
+END
+$func$ LANGUAGE plpgsql;
+
+select * from listar_Registro_Dni('45782541');
+select * from listar_Registro_Dni('54879651');
+select * from listar_Registro_Dni('54851254');
+
+select * from salida_patrimonio
+select * from colaborador	
+select * from patrimonio
